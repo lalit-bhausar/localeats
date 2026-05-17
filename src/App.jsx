@@ -10,6 +10,7 @@ import OrderTracking from './pages/OrderTracking';
 import MyOrders from './pages/MyOrders';
 import Login from './pages/Login';
 import Search from './pages/Search';
+import SeedPage from './pages/SeedPage';
 
 // Admin pages
 import AdminDashboard from './admin/AdminDashboard';
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/orders" element={<MyOrders />} />
         <Route path="/login" element={<Login />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/seed" element={<SeedPage />} />
 
         {/* Admin Panel */}
         <Route path="/admin" element={<AdminDashboard />} />

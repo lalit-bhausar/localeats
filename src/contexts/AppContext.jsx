@@ -5,16 +5,20 @@ import { demoRestaurants, demoMenuItems, demoOrders, demoRiders } from '../utils
 let db = null;
 let firestoreReady = false;
 
+// Firebase disabled temporarily - using demo data
+// To re-enable: uncomment the block below and set firestoreReady = true
+/*
 try {
   const firebase = await import('../firebase.js');
   db = firebase.db;
-  // Check if Firebase is actually configured (not placeholder keys)
   if (db && !firebase.default.options.apiKey?.startsWith('YOUR_')) {
     firestoreReady = true;
   }
 } catch (e) {
   console.log('Firebase not configured, using demo data');
 }
+*/
+console.log('🍽️ LocalEats running with demo data!');
 
 // Lazy-load Firestore functions only when needed
 let firestoreFns = null;
