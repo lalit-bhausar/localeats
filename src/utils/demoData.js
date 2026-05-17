@@ -57,7 +57,7 @@ export const demoRestaurants = [
     id: 'rest4',
     name: 'Chacha Ji Ke Chole Bhature',
     nameHi: 'चाचा जी के छोले भटूरे',
-    image: 'https://images.unsplash.com/photo-1606491956689-2ea866880049?w=400&h=250&fit=crop',
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=250&fit=crop',
     cuisine: ['Street Food', 'North Indian'],
     rating: 4.6,
     totalRatings: 450,
