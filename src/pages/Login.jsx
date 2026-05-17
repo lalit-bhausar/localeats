@@ -56,35 +56,30 @@ export default function Login() {
             <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{user.phone}</p>
           </div>
 
-          {/* Stats */}
-          <div style={{
-            display: 'flex',
-            gap: 12,
-            marginBottom: 24
-          }}>
-            <div style={{
-              flex: 1,
-              background: 'var(--primary-light)',
-              borderRadius: 12,
-              padding: '16px',
-              textAlign: 'center'
-            }}>
-              <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--primary)' }}>{orders.length}</p>
-              <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t('Total Orders', 'कुल ऑर्डर')}</p>
-            </div>
-            <div style={{
-              flex: 1,
-              background: '#F0FFF4',
-              borderRadius: 12,
-              padding: '16px',
-              textAlign: 'center'
-            }}>
-              <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--success)' }}>
-                {orders.filter(o => o.status === 'delivered').length}
-              </p>
-              <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t('Delivered', 'डिलीवर हुए')}</p>
-            </div>
-          </div>
+          {/* Stats - only show this customer's orders */}
+          {(() => {
+            const myOrders = orders.filter(o => o.userId === user.id);
+            return (
+              <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+                <div style={{
+                  flex: 1, background: 'var(--primary-light)',
+                  borderRadius: 12, padding: '16px', textAlign: 'center'
+                }}>
+                  <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--primary)' }}>{myOrders.length}</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t('My Orders', 'मेरे ऑर्डर')}</p>
+                </div>
+                <div style={{
+                  flex: 1, background: '#F0FFF4',
+                  borderRadius: 12, padding: '16px', textAlign: 'center'
+                }}>
+                  <p style={{ fontSize: 24, fontWeight: 800, color: 'var(--success)' }}>
+                    {myOrders.filter(o => o.status === 'delivered').length}
+                  </p>
+                  <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{t('Delivered', 'डिलीवर हुए')}</p>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Menu items */}
           {[
@@ -111,29 +106,6 @@ export default function Login() {
               </div>
             );
           })}
-
-          {/* Admin/Restaurant links */}
-          <div style={{
-            marginTop: 24,
-            padding: 16,
-            background: 'var(--bg-gray)',
-            borderRadius: 12
-          }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 10 }}>
-              {t('Quick Links', 'क्विक लिंक')}
-            </p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <button className="btn btn-sm btn-secondary" onClick={() => navigate('/admin')}>
-                Admin Panel
-              </button>
-              <button className="btn btn-sm btn-secondary" onClick={() => navigate('/restaurant-dashboard')}>
-                Restaurant Dashboard
-              </button>
-              <button className="btn btn-sm btn-secondary" onClick={() => navigate('/rider')}>
-                Rider App
-              </button>
-            </div>
-          </div>
 
           <button
             onClick={handleLogout}
@@ -234,29 +206,6 @@ export default function Login() {
           </button>
         </div>
 
-        {/* Quick links for demo */}
-        <div style={{
-          marginTop: 32,
-          padding: 16,
-          background: 'var(--bg-gray)',
-          borderRadius: 12,
-          textAlign: 'center'
-        }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 10 }}>
-            {t('Demo Access (Admin/Restaurant/Rider)', 'डेमो एक्सेस')}
-          </p>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-sm btn-secondary" onClick={() => navigate('/admin')}>
-              Admin Panel
-            </button>
-            <button className="btn btn-sm btn-secondary" onClick={() => navigate('/restaurant-dashboard')}>
-              Restaurant
-            </button>
-            <button className="btn btn-sm btn-secondary" onClick={() => navigate('/rider')}>
-              Rider
-            </button>
-          </div>
-        </div>
       </div>
 
       <BottomNav />
