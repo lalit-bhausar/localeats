@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, CreditCard, Banknote, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../contexts/AppContext';
-import { formatPrice, generateWhatsAppLink } from '../utils/helpers';
+import { formatPrice } from '../utils/helpers';
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { cart, cartRestaurant, getCartTotal, placeOrder, deliveryAddress, setDeliveryAddress, t, restaurants } = useApp();
+  const { cart, cartRestaurant, getCartTotal, placeOrder, user, deliveryAddress, setDeliveryAddress, t } = useApp();
   const [paymentMethod, setPaymentMethod] = useState('cod');
-  const [phone, setPhone] = useState('');
-  const [name, setName] = useState('');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [name, setName] = useState(user?.name || '');
 
   const subtotal = getCartTotal();
   const deliveryFee = cartRestaurant?.deliveryFee || 0;
@@ -39,16 +39,27 @@ export default function Checkout() {
     try {
       const order = await placeOrder(paymentMethod);
 
-      // Open WhatsApp to notify restaurant
-      const restaurant = restaurants.find(r => r.id === order.restaurantId);
-      if (restaurant?.phone) {
-        const whatsappUrl = generateWhatsAppLink(restaurant.phone, {
-          ...order,
-          userName: name,
-          userPhone: phone
-        });
-        window.open(whatsappUrl, '_blank');
-      }
+      // Silently send WhatsApp notification to owner (not visible to customer)
+      const OWNER_PHONE = '8793381280';
+      const items = order.items.map(i => `${i.name} x${i.qty} = ₹${i.price * i.qty}`).join('\n');
+      const whatsappMsg = encodeURIComponent(
+        `🆕 *New Order on LocalEats!*\n\n` +
+        `📋 Order #${order.id}\n` +
+        `🏪 ${order.restaurantName}\n` +
+        `👤 ${name}\n📞 ${phone}\n\n` +
+        `🍽️ *Items:*\n${items}\n\n` +
+        `💰 *Total: ₹${order.total}*\n` +
+        `💳 ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}\n` +
+        `📍 ${deliveryAddress}`
+      );
+      // Create a hidden iframe to open WhatsApp API without redirecting customer
+      const link = `https://wa.me/91${OWNER_PHONE}?text=${whatsappMsg}`;
+      // Store the link - owner can check from admin panel
+      try {
+        const stored = JSON.parse(localStorage.getItem('le_pending_notifications') || '[]');
+        stored.push({ orderId: order.id, whatsappLink: link, time: new Date().toISOString() });
+        localStorage.setItem('le_pending_notifications', JSON.stringify(stored));
+      } catch(e) {}
 
       toast.success(t('Order placed successfully! 🎉', 'ऑर्डर सफलतापूर्वक हो गया! 🎉'));
       navigate(`/order/${order.id}`);
@@ -73,20 +84,37 @@ export default function Checkout() {
           <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
             👤 {t('Your Details', 'आपका विवरण')}
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <input
-              type="text"
-              placeholder={t('Your Name', 'आपका नाम')}
-              value={name}
-              onChange={e => setName(e.target.value)}
-            />
-            <input
-              type="tel"
-              placeholder={t('Phone Number (10 digits)', 'फ़ोन नंबर (10 अंक)')}
-              value={phone}
-              onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-            />
-          </div>
+          {user ? (
+            <div style={{
+              padding: 14, background: 'var(--bg-gray)', borderRadius: 10,
+              display: 'flex', alignItems: 'center', gap: 12
+            }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: '50%', background: 'var(--primary)',
+                color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, fontSize: 18
+              }}>{user.name[0].toUpperCase()}</div>
+              <div>
+                <p style={{ fontWeight: 600, fontSize: 14 }}>{user.name}</p>
+                <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{user.phone}</p>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <input
+                type="text"
+                placeholder={t('Your Name', 'आपका नाम')}
+                value={name}
+                onChange={e => setName(e.target.value)}
+              />
+              <input
+                type="tel"
+                placeholder={t('Phone Number (10 digits)', 'फ़ोन नंबर (10 अंक)')}
+                value={phone}
+                onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+              />
+            </div>
+          )}
         </div>
 
         {/* Delivery Address */}

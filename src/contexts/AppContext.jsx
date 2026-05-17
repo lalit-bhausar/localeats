@@ -31,11 +31,27 @@ const getFirestoreFns = async () => {
 
 const AppContext = createContext();
 
+// Load saved user from localStorage
+const getSavedUser = () => {
+  try {
+    const saved = localStorage.getItem('le_current_user');
+    return saved ? JSON.parse(saved) : null;
+  } catch { return null; }
+};
+
+// Load saved orders from localStorage
+const getSavedOrders = () => {
+  try {
+    const saved = localStorage.getItem('le_orders');
+    return saved ? JSON.parse(saved) : [];
+  } catch { return []; }
+};
+
 export function AppProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(getSavedUser);
   const [cart, setCart] = useState([]);
   const [cartRestaurant, setCartRestaurant] = useState(null);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(getSavedOrders);
   const [restaurants, setRestaurants] = useState([]);
   const [menuItems, setMenuItems] = useState({});
   const [riders, setRiders] = useState([]);
@@ -44,6 +60,22 @@ export function AppProvider({ children }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [useFirebase, setUseFirebase] = useState(firestoreReady);
+
+  // Save user to localStorage when it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('le_current_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('le_current_user');
+    }
+  }, [user]);
+
+  // Save orders to localStorage when they change
+  useEffect(() => {
+    if (orders.length > 0) {
+      localStorage.setItem('le_orders', JSON.stringify(orders));
+    }
+  }, [orders]);
 
   // ============================================
   // LOAD DATA - Firebase or Demo

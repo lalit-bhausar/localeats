@@ -17,11 +17,27 @@ export default function Login() {
       toast.error(t('Please fill name and phone', 'कृपया नाम और फ़ोन भरें'));
       return;
     }
-    setUser({ id: 'user_' + Date.now(), name, phone, email });
+    // Check if this phone number was used before
+    const savedUsers = JSON.parse(localStorage.getItem('le_users') || '{}');
+    let userData;
+    if (savedUsers[phone]) {
+      // Returning customer - use their saved ID so order history is linked
+      userData = { ...savedUsers[phone], name, phone, email: email || savedUsers[phone].email };
+    } else {
+      // New customer
+      userData = { id: 'user_' + phone, name, phone, email };
+    }
+    // Save to localStorage for next time
+    savedUsers[phone] = userData;
+    localStorage.setItem('le_users', JSON.stringify(savedUsers));
+    localStorage.setItem('le_current_user', JSON.stringify(userData));
+
+    setUser(userData);
     toast.success(t('Welcome! 🎉', 'स्वागत है! 🎉'));
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('le_current_user');
     setUser(null);
     toast.success(t('Logged out', 'लॉग आउट हो गया'));
   };
