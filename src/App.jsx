@@ -24,6 +24,9 @@ import RestaurantDashboard from './restaurant/RestaurantDashboard';
 // Rider app
 import RiderApp from './rider/RiderApp';
 
+// Admin password guard
+import AdminGuard from './components/AdminGuard';
+
 export default function App() {
   return (
     <>
@@ -45,19 +48,20 @@ export default function App() {
         <Route path="/orders" element={<MyOrders />} />
         <Route path="/login" element={<Login />} />
         <Route path="/search" element={<Search />} />
-        <Route path="/seed" element={<SeedPage />} />
+        {/* Admin Panel - Password Protected */}
+        <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+        <Route path="/admin/restaurants" element={<AdminGuard><AdminRestaurants /></AdminGuard>} />
+        <Route path="/admin/orders" element={<AdminGuard><AdminOrders /></AdminGuard>} />
+        <Route path="/admin/menu/:restaurantId" element={<AdminGuard><AdminMenu /></AdminGuard>} />
 
-        {/* Admin Panel */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/restaurants" element={<AdminRestaurants />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/menu/:restaurantId" element={<AdminMenu />} />
+        {/* Restaurant Dashboard - Password Protected */}
+        <Route path="/restaurant-dashboard" element={<AdminGuard><RestaurantDashboard /></AdminGuard>} />
 
-        {/* Restaurant Dashboard */}
-        <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
+        {/* Rider App - Password Protected */}
+        <Route path="/rider" element={<AdminGuard><RiderApp /></AdminGuard>} />
 
-        {/* Rider App */}
-        <Route path="/rider" element={<RiderApp />} />
+        {/* Seed Page - Password Protected */}
+        <Route path="/seed" element={<AdminGuard><SeedPage /></AdminGuard>} />
       </Routes>
     </>
   );
