@@ -8,8 +8,10 @@ export default function MyOrders() {
   const navigate = useNavigate();
   const { orders, user, t, lang } = useApp();
 
-  // Only show this customer's orders
-  const myOrders = user ? orders.filter(o => o.userId === user.id) : [];
+  // Show this customer's orders - match by userId OR phone number
+  const myOrders = user ? orders.filter(o =>
+    o.userId === user.id || o.userPhone === user.phone
+  ) : [];
 
   return (
     <div className="app-container">

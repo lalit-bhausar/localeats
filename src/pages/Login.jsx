@@ -74,7 +74,7 @@ export default function Login() {
 
           {/* Stats - only show this customer's orders */}
           {(() => {
-            const myOrders = orders.filter(o => o.userId === user.id);
+            const myOrders = orders.filter(o => o.userId === user.id || o.userPhone === user.phone);
             return (
               <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
                 <div style={{
