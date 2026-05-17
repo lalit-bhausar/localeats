@@ -38,38 +38,42 @@ export default function Checkout() {
 
     try {
       const order = await placeOrder(paymentMethod);
-
-      // Build WhatsApp message for restaurant owner with status update links
-      const OWNER_PHONE = '8793381280';
       const APP_URL = window.location.origin;
+
+      // Send instant push notification to owner via ntfy.sh (FREE, no server needed)
       const items = order.items.map(i => `${i.name} x${i.qty} = ₹${i.price * i.qty}`).join('\n');
       const confirmUrl = `${APP_URL}/order-action/${order.id}/confirmed`;
 
-      const whatsappMsg = encodeURIComponent(
-        `🆕 *New Order on LocalEats!*\n\n` +
-        `📋 Order #${order.id}\n` +
-        `🏪 ${order.restaurantName}\n` +
-        `👤 ${name || user?.name}\n` +
-        `📞 ${phone || user?.phone}\n\n` +
-        `🍽️ *Items:*\n${items}\n\n` +
-        `💰 *Total: ₹${order.total}*\n` +
-        `💳 ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}\n\n` +
-        `📍 *Deliver to:* ${deliveryAddress}\n\n` +
-        `✅ *Confirm Order:*\n${confirmUrl}\n\n` +
-        `👨‍🍳 *Mark Preparing:*\n${APP_URL}/order-action/${order.id}/preparing\n\n` +
-        `🏍️ *Out for Delivery:*\n${APP_URL}/order-action/${order.id}/out_for_delivery\n\n` +
-        `📦 *Mark Delivered:*\n${APP_URL}/order-action/${order.id}/delivered`
-      );
+      try {
+        await fetch('https://ntfy.sh/localeats-orders-8793', {
+          method: 'POST',
+          headers: {
+            'Title': `🆕 New Order #${order.id} - ₹${order.total}`,
+            'Priority': 'high',
+            'Tags': 'fork_and_knife,moneybag',
+            'Actions': [
+              `view, ✅ Confirm Order, ${confirmUrl}`,
+              `view, 👨‍🍳 Mark Preparing, ${APP_URL}/order-action/${order.id}/preparing`
+            ].join('; '),
+            'Click': confirmUrl
+          },
+          body: `🏪 ${order.restaurantName}\n` +
+            `👤 ${name || user?.name} | 📞 ${phone || user?.phone}\n\n` +
+            `🍽️ Items:\n${items}\n\n` +
+            `💰 Total: ₹${order.total}\n` +
+            `💳 ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}\n` +
+            `📍 ${deliveryAddress}\n\n` +
+            `✅ Confirm: ${confirmUrl}\n` +
+            `👨‍🍳 Preparing: ${APP_URL}/order-action/${order.id}/preparing\n` +
+            `🏍️ Out for Delivery: ${APP_URL}/order-action/${order.id}/out_for_delivery\n` +
+            `📦 Delivered: ${APP_URL}/order-action/${order.id}/delivered`
+        });
+      } catch (e) {
+        console.log('Notification send failed:', e);
+      }
 
-      toast.success(t('Order placed! Notifying restaurant...', 'ऑर्डर हो गया! रेस्तरां को सूचित कर रहे हैं...'));
-
-      // Navigate to order tracking first
+      toast.success(t('Order placed successfully! 🎉', 'ऑर्डर सफलतापूर्वक हो गया! 🎉'));
       navigate(`/order/${order.id}`);
-
-      // Then open WhatsApp to send notification to owner
-      setTimeout(() => {
-        window.open(`https://wa.me/91${OWNER_PHONE}?text=${whatsappMsg}`, '_blank');
-      }, 500);
     } catch (err) {
       toast.error(t('Failed to place order. Try again.', 'ऑर्डर नहीं हो पाया। फिर कोशिश करें।'));
     }
