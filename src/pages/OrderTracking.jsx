@@ -269,6 +269,16 @@ export default function OrderTracking() {
               : 'UPI'}</span>
             <span>{t('Address', 'पता')}: {order.deliveryAddress}</span>
           </div>
+          {order.upiTransactionId && (
+            <div style={{
+              marginTop: 8, padding: '8px 12px', background: '#F0FFF4',
+              borderRadius: 8, fontSize: 12
+            }}>
+              <span style={{ color: '#22C55E', fontWeight: 600 }}>
+                UPI Txn ID: {order.upiTransactionId}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
