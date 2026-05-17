@@ -39,30 +39,37 @@ export default function Checkout() {
     try {
       const order = await placeOrder(paymentMethod);
 
-      // Silently send WhatsApp notification to owner (not visible to customer)
+      // Build WhatsApp message for restaurant owner with status update links
       const OWNER_PHONE = '8793381280';
+      const APP_URL = window.location.origin;
       const items = order.items.map(i => `${i.name} x${i.qty} = ₹${i.price * i.qty}`).join('\n');
+      const confirmUrl = `${APP_URL}/order-action/${order.id}/confirmed`;
+
       const whatsappMsg = encodeURIComponent(
         `🆕 *New Order on LocalEats!*\n\n` +
         `📋 Order #${order.id}\n` +
         `🏪 ${order.restaurantName}\n` +
-        `👤 ${name}\n📞 ${phone}\n\n` +
+        `👤 ${name || user?.name}\n` +
+        `📞 ${phone || user?.phone}\n\n` +
         `🍽️ *Items:*\n${items}\n\n` +
         `💰 *Total: ₹${order.total}*\n` +
-        `💳 ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}\n` +
-        `📍 ${deliveryAddress}`
+        `💳 ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}\n\n` +
+        `📍 *Deliver to:* ${deliveryAddress}\n\n` +
+        `✅ *Confirm Order:*\n${confirmUrl}\n\n` +
+        `👨‍🍳 *Mark Preparing:*\n${APP_URL}/order-action/${order.id}/preparing\n\n` +
+        `🏍️ *Out for Delivery:*\n${APP_URL}/order-action/${order.id}/out_for_delivery\n\n` +
+        `📦 *Mark Delivered:*\n${APP_URL}/order-action/${order.id}/delivered`
       );
-      // Create a hidden iframe to open WhatsApp API without redirecting customer
-      const link = `https://wa.me/91${OWNER_PHONE}?text=${whatsappMsg}`;
-      // Store the link - owner can check from admin panel
-      try {
-        const stored = JSON.parse(localStorage.getItem('le_pending_notifications') || '[]');
-        stored.push({ orderId: order.id, whatsappLink: link, time: new Date().toISOString() });
-        localStorage.setItem('le_pending_notifications', JSON.stringify(stored));
-      } catch(e) {}
 
-      toast.success(t('Order placed successfully! 🎉', 'ऑर्डर सफलतापूर्वक हो गया! 🎉'));
+      toast.success(t('Order placed! Notifying restaurant...', 'ऑर्डर हो गया! रेस्तरां को सूचित कर रहे हैं...'));
+
+      // Navigate to order tracking first
       navigate(`/order/${order.id}`);
+
+      // Then open WhatsApp to send notification to owner
+      setTimeout(() => {
+        window.open(`https://wa.me/91${OWNER_PHONE}?text=${whatsappMsg}`, '_blank');
+      }, 500);
     } catch (err) {
       toast.error(t('Failed to place order. Try again.', 'ऑर्डर नहीं हो पाया। फिर कोशिश करें।'));
     }

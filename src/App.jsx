@@ -11,6 +11,7 @@ import MyOrders from './pages/MyOrders';
 import Login from './pages/Login';
 import Search from './pages/Search';
 import SeedPage from './pages/SeedPage';
+import OrderAction from './pages/OrderAction';
 
 // Admin pages
 import AdminDashboard from './admin/AdminDashboard';
@@ -48,6 +49,10 @@ export default function App() {
         <Route path="/orders" element={<MyOrders />} />
         <Route path="/login" element={<Login />} />
         <Route path="/search" element={<Search />} />
+
+        {/* Order status update via WhatsApp links - Password Protected */}
+        <Route path="/order-action/:orderId/:status" element={<AdminGuard><OrderAction /></AdminGuard>} />
+
         {/* Admin Panel - Password Protected */}
         <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
         <Route path="/admin/restaurants" element={<AdminGuard><AdminRestaurants /></AdminGuard>} />
