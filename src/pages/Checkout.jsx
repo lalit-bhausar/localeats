@@ -22,7 +22,7 @@ export default function Checkout() {
     return null;
   }
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!name.trim()) {
       toast.error(t('Please enter your name', 'कृपया अपना नाम दर्ज करें'));
       return;
@@ -36,21 +36,25 @@ export default function Checkout() {
       return;
     }
 
-    const order = placeOrder(paymentMethod);
+    try {
+      const order = await placeOrder(paymentMethod);
 
-    // Open WhatsApp to notify restaurant
-    const restaurant = restaurants.find(r => r.id === order.restaurantId);
-    if (restaurant?.phone) {
-      const whatsappUrl = generateWhatsAppLink(restaurant.phone, {
-        ...order,
-        userName: name,
-        userPhone: phone
-      });
-      window.open(whatsappUrl, '_blank');
+      // Open WhatsApp to notify restaurant
+      const restaurant = restaurants.find(r => r.id === order.restaurantId);
+      if (restaurant?.phone) {
+        const whatsappUrl = generateWhatsAppLink(restaurant.phone, {
+          ...order,
+          userName: name,
+          userPhone: phone
+        });
+        window.open(whatsappUrl, '_blank');
+      }
+
+      toast.success(t('Order placed successfully! 🎉', 'ऑर्डर सफलतापूर्वक हो गया! 🎉'));
+      navigate(`/order/${order.id}`);
+    } catch (err) {
+      toast.error(t('Failed to place order. Try again.', 'ऑर्डर नहीं हो पाया। फिर कोशिश करें।'));
     }
-
-    toast.success(t('Order placed successfully! 🎉', 'ऑर्डर सफलतापूर्वक हो गया! 🎉'));
-    navigate(`/order/${order.id}`);
   };
 
   return (
