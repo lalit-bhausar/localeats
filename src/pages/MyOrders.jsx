@@ -6,7 +6,10 @@ import BottomNav from '../components/BottomNav';
 
 export default function MyOrders() {
   const navigate = useNavigate();
-  const { orders, t, lang } = useApp();
+  const { orders, user, t, lang } = useApp();
+
+  // Only show this customer's orders
+  const myOrders = user ? orders.filter(o => o.userId === user.id) : [];
 
   return (
     <div className="app-container">
@@ -14,7 +17,7 @@ export default function MyOrders() {
         <h2 style={{ fontSize: 18, fontWeight: 700 }}>{t('My Orders', 'मेरे ऑर्डर')}</h2>
       </div>
 
-      {orders.length === 0 ? (
+      {myOrders.length === 0 ? (
         <div className="empty-state">
           <ClipboardList size={60} color="var(--text-light)" />
           <h3>{t('No orders yet', 'अभी तक कोई ऑर्डर नहीं')}</h3>
@@ -25,7 +28,7 @@ export default function MyOrders() {
         </div>
       ) : (
         <div style={{ padding: '12px 16px', paddingBottom: 80 }}>
-          {orders.map(order => (
+          {myOrders.map(order => (
             <div
               key={order.id}
               className="card fade-in"

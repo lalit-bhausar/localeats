@@ -156,54 +156,7 @@ export const demoMenuItems = {
   ]
 };
 
-export const demoOrders = [
-  {
-    id: 'ord1',
-    userId: 'user1',
-    userName: 'Rahul Kumar',
-    userPhone: '9876500001',
-    restaurantId: 'rest1',
-    restaurantName: 'Sharma Ji Ka Dhaba',
-    items: [
-      { name: 'Butter Chicken', qty: 1, price: 280 },
-      { name: 'Naan', qty: 3, price: 40 },
-      { name: 'Dal Makhani', qty: 1, price: 180 }
-    ],
-    subtotal: 580,
-    deliveryFee: 20,
-    total: 600,
-    status: 'delivered',
-    paymentMethod: 'cod',
-    deliveryAddress: '45, Sector 3, Near Park',
-    riderId: 'rider1',
-    riderName: 'Amit',
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    estimatedDelivery: '35 min'
-  },
-  {
-    id: 'ord2',
-    userId: 'user1',
-    userName: 'Rahul Kumar',
-    userPhone: '9876500001',
-    restaurantId: 'rest3',
-    restaurantName: 'Pizza Point',
-    items: [
-      { name: 'Margherita Pizza', qty: 2, price: 199 },
-      { name: 'French Fries', qty: 1, price: 89 },
-      { name: 'Cold Coffee', qty: 2, price: 99 }
-    ],
-    subtotal: 685,
-    deliveryFee: 25,
-    total: 710,
-    status: 'preparing',
-    paymentMethod: 'upi',
-    deliveryAddress: '45, Sector 3, Near Park',
-    riderId: null,
-    riderName: null,
-    createdAt: new Date().toISOString(),
-    estimatedDelivery: '40 min'
-  }
-];
+export const demoOrders = [];
 
 export const demoRiders = [
   { id: 'rider1', name: 'Amit Kumar', phone: '9876500010', isAvailable: true, rating: 4.7, totalDeliveries: 234 },
