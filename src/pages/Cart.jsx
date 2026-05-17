@@ -6,7 +6,7 @@ import BottomNav from '../components/BottomNav';
 
 export default function Cart() {
   const navigate = useNavigate();
-  const { cart, cartRestaurant, addToCart, removeFromCart, clearCart, getCartTotal, t } = useApp();
+  const { cart, cartRestaurant, addToCart, removeFromCart, clearCart, getCartTotal, t, user } = useApp();
 
   const subtotal = getCartTotal();
   const deliveryFee = cartRestaurant?.deliveryFee || 0;
@@ -164,13 +164,23 @@ export default function Cart() {
 
       {/* Checkout button */}
       <div style={{ padding: '12px 16px 90px' }}>
-        <button
-          className="btn btn-primary btn-full"
-          style={{ padding: 14, fontSize: 15, borderRadius: 12 }}
-          onClick={() => navigate('/checkout')}
-        >
-          {t('Proceed to Checkout', 'चेकआउट पर जाएँ')} • {formatPrice(total)}
-        </button>
+        {user ? (
+          <button
+            className="btn btn-primary btn-full"
+            style={{ padding: 14, fontSize: 15, borderRadius: 12 }}
+            onClick={() => navigate('/checkout')}
+          >
+            {t('Proceed to Checkout', 'चेकआउट पर जाएँ')} • {formatPrice(total)}
+          </button>
+        ) : (
+          <button
+            className="btn btn-primary btn-full"
+            style={{ padding: 14, fontSize: 15, borderRadius: 12 }}
+            onClick={() => navigate('/login', { state: { from: '/checkout' } })}
+          >
+            {t('Login to Place Order', 'ऑर्डर करने के लिए लॉगिन करें')} • {formatPrice(total)}
+          </button>
+        )}
       </div>
 
       <BottomNav />

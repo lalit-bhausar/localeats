@@ -37,6 +37,12 @@ export default function Checkout() {
   // Pre-generate QR code URL
   const qrUrl = useMemo(() => getQrCodeUrl(total, ''), [total]);
 
+  // Require login
+  if (!user) {
+    navigate('/login', { state: { from: '/checkout' } });
+    return null;
+  }
+
   if (cart.length === 0) {
     navigate('/cart');
     return null;
