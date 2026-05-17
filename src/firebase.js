@@ -16,13 +16,13 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  // REPLACE THESE WITH YOUR FIREBASE PROJECT CONFIG
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBld5pyMVMqcBEBHVYBPs0YX4CU5uNr0y8",
+  authDomain: "localeats-48917.firebaseapp.com",
+  projectId: "localeats-48917",
+  storageBucket: "localeats-48917.firebasestorage.app",
+  messagingSenderId: "403237180648",
+  appId: "1:403237180648:web:7d0367ab6236e469fde55d",
+  measurementId: "G-NFTLV6BCSJ"
 };
 
 const app = initializeApp(firebaseConfig);
