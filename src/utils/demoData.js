@@ -57,7 +57,7 @@ export const demoRestaurants = [
     id: 'rest4',
     name: 'Chacha Ji Ke Chole Bhature',
     nameHi: 'चाचा जी के छोले भटूरे',
-    image: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=400&h=250&fit=crop',
+    image: 'https://madhurasrecipe.com/wp-content/uploads/2025/09/MR-Chole-Bhature-featured.jpg',
     cuisine: ['Street Food', 'North Indian'],
     rating: 4.6,
     totalRatings: 450,
