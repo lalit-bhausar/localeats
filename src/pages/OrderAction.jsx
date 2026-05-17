@@ -27,17 +27,19 @@ export default function OrderAction() {
     if (orderId && status && statusLabels[status]) {
       updateOrderStatus(orderId, status);
 
-      // Also broadcast status update via ntfy so customer's app can pick it up
+      // Broadcast status update via ntfy so customer's app can pick it up in real-time
       try {
-        fetch('https://ntfy.sh/localeats-order-' + orderId, {
+        fetch('https://ntfy.sh/', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             topic: 'localeats-order-' + orderId,
             title: 'Order Status Update',
             message: status,
             priority: 3
           })
-        }).catch(() => {});
+        }).then(r => console.log('Status broadcast sent:', r.status))
+          .catch(e => console.error('Status broadcast failed:', e));
       } catch (e) {}
 
       setDone(true);
