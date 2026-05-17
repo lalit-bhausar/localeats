@@ -44,38 +44,31 @@ export default function Checkout() {
       const items = order.items.map(i => `${i.name} x${i.qty} = ₹${i.price * i.qty}`).join('\n');
       const confirmUrl = `${APP_URL}/order-action/${order.id}/confirmed`;
 
+      // Send notification to restaurant owner
       try {
-        const ntfyBody = [
-          `Restaurant: ${order.restaurantName}`,
-          `Customer: ${name || user?.name} | Phone: ${phone || user?.phone}`,
-          ``,
-          `Items:`,
-          items,
-          ``,
-          `Total: Rs.${order.total}`,
-          `Payment: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}`,
-          `Address: ${deliveryAddress}`,
-          ``,
-          `-- Update Order Status --`,
-          `Confirm: ${confirmUrl}`,
-          `Preparing: ${APP_URL}/order-action/${order.id}/preparing`,
-          `Out for Delivery: ${APP_URL}/order-action/${order.id}/out_for_delivery`,
-          `Delivered: ${APP_URL}/order-action/${order.id}/delivered`
-        ].join('\n');
+        const msgBody = 'Restaurant: ' + order.restaurantName + '\n' +
+          'Customer: ' + (name || user?.name || 'Guest') + ' | Phone: ' + (phone || user?.phone || 'N/A') + '\n\n' +
+          'Items:\n' + items + '\n\n' +
+          'Total: Rs.' + order.total + '\n' +
+          'Payment: ' + (paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI') + '\n' +
+          'Address: ' + deliveryAddress + '\n\n' +
+          'Confirm: ' + confirmUrl + '\n' +
+          'Preparing: ' + APP_URL + '/order-action/' + order.id + '/preparing\n' +
+          'Out for Delivery: ' + APP_URL + '/order-action/' + order.id + '/out_for_delivery\n' +
+          'Delivered: ' + APP_URL + '/order-action/' + order.id + '/delivered';
 
-        await fetch('https://ntfy.sh/localeats-orders-8793', {
+        fetch('https://ntfy.sh/localeats-orders-8793', {
           method: 'POST',
-          headers: {
-            'Title': 'New Order #' + order.id + ' - Rs.' + order.total,
-            'Priority': 'high',
-            'Tags': 'fork_and_knife',
-            'Click': confirmUrl
-          },
-          body: ntfyBody
-        });
-        console.log('Notification sent successfully!');
+          body: JSON.stringify({
+            topic: 'localeats-orders-8793',
+            title: 'New Order ' + order.id,
+            message: msgBody,
+            priority: 4
+          })
+        }).then(r => console.log('ntfy status:', r.status))
+          .catch(e => console.error('ntfy error:', e));
       } catch (e) {
-        console.error('Notification send failed:', e);
+        console.error('ntfy setup error:', e);
       }
 
       toast.success(t('Order placed successfully! 🎉', 'ऑर्डर सफलतापूर्वक हो गया! 🎉'));
