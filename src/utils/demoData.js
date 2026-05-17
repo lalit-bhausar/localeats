@@ -16,7 +16,7 @@ export const demoRestaurants = [
     isOpen: true,
     isVeg: false,
     address: 'Main Market, Near Bus Stand',
-    phone: '9876543210',
+    phone: '8793381280',
     description: 'Famous for butter chicken and dal makhani since 1995'
   },
   {
@@ -33,7 +33,7 @@ export const demoRestaurants = [
     isOpen: true,
     isVeg: true,
     address: 'Gandhi Chowk, Shop No. 12',
-    phone: '9876543211',
+    phone: '8793381280',
     description: 'Pure vegetarian family restaurant with homestyle cooking'
   },
   {
@@ -50,7 +50,7 @@ export const demoRestaurants = [
     isOpen: true,
     isVeg: false,
     address: 'College Road, Near Railway Station',
-    phone: '9876543212',
+    phone: '8793381280',
     description: 'Best pizzas, burgers, and pasta in town'
   },
   {
@@ -67,7 +67,7 @@ export const demoRestaurants = [
     isOpen: true,
     isVeg: true,
     address: 'Station Road, Opposite Park',
-    phone: '9876543213',
+    phone: '8793381280',
     description: 'Famous chole bhature since 30 years!'
   },
   {
@@ -84,7 +84,7 @@ export const demoRestaurants = [
     isOpen: false,
     isVeg: false,
     address: 'Civil Lines, Near Hospital',
-    phone: '9876543214',
+    phone: '8793381280',
     description: 'Authentic Hyderabadi biryani and kebabs'
   },
   {
@@ -101,7 +101,7 @@ export const demoRestaurants = [
     isOpen: true,
     isVeg: true,
     address: 'Market Road, Shop No. 5',
-    phone: '9876543215',
+    phone: '8793381280',
     description: 'Fresh fruit juices, milkshakes, and ice cream'
   }
 ];
