@@ -125,10 +125,11 @@ export function AppProvider({ children }) {
           setRiders(demoRiders);
         }
       } else {
-        // Use demo data
+        // Use demo data but KEEP localStorage orders (don't overwrite real orders)
         setRestaurants(demoRestaurants);
         setMenuItems(demoMenuItems);
-        setOrders(demoOrders);
+        const savedOrders = getSavedOrders();
+        setOrders(savedOrders.length > 0 ? savedOrders : demoOrders);
         setRiders(demoRiders);
       }
       setLoading(false);

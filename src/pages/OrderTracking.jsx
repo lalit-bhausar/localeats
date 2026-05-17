@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ArrowLeft, Phone, MessageCircle, CheckCircle2, Clock, ChefHat, Bike, Package } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { formatPrice, getStatusColor, getStatusText, timeAgo } from '../utils/helpers';
@@ -14,9 +15,29 @@ const statusSteps = [
 export default function OrderTracking() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { orders, t, lang } = useApp();
+  const { orders, t, lang, updateOrderStatus } = useApp();
 
   const order = orders.find(o => o.id === id);
+
+  // Listen for real-time status updates from restaurant owner via ntfy
+  useEffect(() => {
+    if (!id) return;
+    let eventSource;
+    try {
+      eventSource = new EventSource('https://ntfy.sh/localeats-order-' + id + '/sse');
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.message && ['confirmed', 'preparing', 'out_for_delivery', 'delivered'].includes(data.message)) {
+            updateOrderStatus(id, data.message);
+          }
+        } catch (e) {}
+      };
+    } catch (e) {}
+    return () => {
+      if (eventSource) eventSource.close();
+    };
+  }, [id, updateOrderStatus]);
 
   if (!order) {
     return (

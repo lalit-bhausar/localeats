@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 
@@ -14,18 +14,32 @@ const APP_URL = window.location.origin;
 export default function OrderAction() {
   const { orderId, status } = useParams();
   const navigate = useNavigate();
-  const { updateOrderStatus, orders, t } = useApp();
+  const { updateOrderStatus, orders } = useApp();
   const [done, setDone] = useState(false);
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    // Find the order
+    // Find the order in local state (may not exist if on a different device)
     const found = orders.find(o => o.id === orderId);
     setOrder(found);
 
-    // Update the status
+    // Update the status locally
     if (orderId && status && statusLabels[status]) {
       updateOrderStatus(orderId, status);
+
+      // Also broadcast status update via ntfy so customer's app can pick it up
+      try {
+        fetch('https://ntfy.sh/localeats-order-' + orderId, {
+          method: 'POST',
+          body: JSON.stringify({
+            topic: 'localeats-order-' + orderId,
+            title: 'Order Status Update',
+            message: status,
+            priority: 3
+          })
+        }).catch(() => {});
+      } catch (e) {}
+
       setDone(true);
     }
   }, [orderId, status]);
@@ -33,18 +47,6 @@ export default function OrderAction() {
   const info = statusLabels[status] || {};
   const nextStatus = info.next;
   const nextInfo = nextStatus ? statusLabels[nextStatus] : null;
-
-  // Generate WhatsApp link for next status update
-  const getNextWhatsAppLink = () => {
-    if (!nextInfo || !orderId) return null;
-    const OWNER_PHONE = '8793381280';
-    const nextUrl = `${APP_URL}/order-action/${orderId}/${nextStatus}`;
-    const msg = encodeURIComponent(
-      `Update Order #${orderId} to *${nextInfo.en}* ${nextInfo.emoji}\n\n` +
-      `👉 Click to update: ${nextUrl}`
-    );
-    return `https://wa.me/91${OWNER_PHONE}?text=${msg}`;
-  };
 
   return (
     <div style={{
@@ -80,10 +82,10 @@ export default function OrderAction() {
                   <strong>Customer:</strong> {order.userName} ({order.userPhone})
                 </p>
                 <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
-                  <strong>Items:</strong> {order.items?.map(i => `${i.name} x${i.qty}`).join(', ')}
+                  <strong>Items:</strong> {order.items?.map(i => i.name + ' x' + i.qty).join(', ')}
                 </p>
                 <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
-                  <strong>Total:</strong> ₹{order.total}
+                  <strong>Total:</strong> Rs.{order.total}
                 </p>
                 <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
                   <strong>Address:</strong> {order.deliveryAddress}
@@ -93,7 +95,7 @@ export default function OrderAction() {
 
             {nextInfo && (
               <a
-                href={`${APP_URL}/order-action/${orderId}/${nextStatus}`}
+                href={APP_URL + '/order-action/' + orderId + '/' + nextStatus}
                 style={{
                   display: 'block', width: '100%', padding: 14,
                   background: '#FF6B00', color: 'white', border: 'none',
