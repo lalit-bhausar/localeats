@@ -45,31 +45,37 @@ export default function Checkout() {
       const confirmUrl = `${APP_URL}/order-action/${order.id}/confirmed`;
 
       try {
+        const ntfyBody = [
+          `Restaurant: ${order.restaurantName}`,
+          `Customer: ${name || user?.name} | Phone: ${phone || user?.phone}`,
+          ``,
+          `Items:`,
+          items,
+          ``,
+          `Total: Rs.${order.total}`,
+          `Payment: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}`,
+          `Address: ${deliveryAddress}`,
+          ``,
+          `-- Update Order Status --`,
+          `Confirm: ${confirmUrl}`,
+          `Preparing: ${APP_URL}/order-action/${order.id}/preparing`,
+          `Out for Delivery: ${APP_URL}/order-action/${order.id}/out_for_delivery`,
+          `Delivered: ${APP_URL}/order-action/${order.id}/delivered`
+        ].join('\n');
+
         await fetch('https://ntfy.sh/localeats-orders-8793', {
           method: 'POST',
           headers: {
-            'Title': `🆕 New Order #${order.id} - ₹${order.total}`,
+            'Title': 'New Order #' + order.id + ' - Rs.' + order.total,
             'Priority': 'high',
-            'Tags': 'fork_and_knife,moneybag',
-            'Actions': [
-              `view, ✅ Confirm Order, ${confirmUrl}`,
-              `view, 👨‍🍳 Mark Preparing, ${APP_URL}/order-action/${order.id}/preparing`
-            ].join('; '),
+            'Tags': 'fork_and_knife',
             'Click': confirmUrl
           },
-          body: `🏪 ${order.restaurantName}\n` +
-            `👤 ${name || user?.name} | 📞 ${phone || user?.phone}\n\n` +
-            `🍽️ Items:\n${items}\n\n` +
-            `💰 Total: ₹${order.total}\n` +
-            `💳 ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI'}\n` +
-            `📍 ${deliveryAddress}\n\n` +
-            `✅ Confirm: ${confirmUrl}\n` +
-            `👨‍🍳 Preparing: ${APP_URL}/order-action/${order.id}/preparing\n` +
-            `🏍️ Out for Delivery: ${APP_URL}/order-action/${order.id}/out_for_delivery\n` +
-            `📦 Delivered: ${APP_URL}/order-action/${order.id}/delivered`
+          body: ntfyBody
         });
+        console.log('Notification sent successfully!');
       } catch (e) {
-        console.log('Notification send failed:', e);
+        console.error('Notification send failed:', e);
       }
 
       toast.success(t('Order placed successfully! 🎉', 'ऑर्डर सफलतापूर्वक हो गया! 🎉'));
